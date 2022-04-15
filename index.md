@@ -3,7 +3,7 @@
 
 ### Homework 1
 Link for the HW1 .Rmd file:
-[link](https://github.com/BU-IE-360/spring22-TugceCaglayan/blob/gh-pages/x.Rmd)
+[link](https://github.com/BU-IE-360/spring22-TugceCaglayan/blob/gh-pages/HW%201/x.Rmd)
 
 Link for the HW1 html file: 
 [HW1]()
