@@ -1,0 +1,130 @@
+---
+title: "IE 360- HW 1"
+author: "Tugce Caglayan"
+date: '2022-04-14'
+output: html_document
+---
+
+# INTRODUCTION
+
+Economic data can be analyzed as time series data after a certain time and used in forecasting applications. Observed results can depend on many different variables. There may be relationships between variables such as cause-effect or correlation. In this way, more accurate predictions are tried to be obtained for forecasting. In this analysis, the relationship between four different variables-exchange rates (USD/TRY Selling),consumer price index for food,interest rate for personal bank loan,Google search for 'Market Prices'- and their changes over time are examined. In this study, the following questions will be examined:
+
+1-How has the USD/TRY rate,interest rate and cpi changed from January 2020 to today?
+2-How can the relationship between Interest Rate and USD/TRY be explained?
+3-How was CPI affected by interest rate and USD/TRY change?
+4-How is the relationship between these variables in terms of correlation?
+
+In addition, the 'Market Prices' change in Google will be examined together with these data sets.
+All data sets are obtained from Electronic Data Delivery System of Central Bank of the Republic of Turkey. 
+
+
+```{r warning=FALSE, message=FALSE}
+library(openxlsx)
+library(ggplot2)
+library(data.table)
+library(skimr)
+library(GGally)
+library(ggcorrplot)
+library(lubridate)
+
+Exchange_path='C:/Users/tugce/Desktop/SPRING 2022/IE 360/HW 1/ExchangeRate.xlsx'
+Interest_path='C:/Users/tugce/Desktop/SPRING 2022/IE 360/HW 1/Interest Rates.xlsx'
+CPI_path='C:/Users/tugce/Desktop/SPRING 2022/IE 360/HW 1/ConsumerPriceIndex.xlsx'
+market_fiyatlari_path='C:/Users/tugce/Desktop/SPRING 2022/IE 360/HW 1/multiTimeline.xlsx'
+Exchange_Rate=read.xlsx(Exchange_path)
+Interest_Rate=read.xlsx(Interest_path)
+CPI=read.xlsx(CPI_path)
+Market_fiyatlari=read.xlsx(market_fiyatlari_path)
+
+CPI$Date=as.yearmon(CPI$Date)
+Exchange_Rate$Date=as.yearmon(Exchange_Rate$Date)
+Interest_Rate$Date=as.yearmon(Interest_Rate$Date)
+Market_fiyatlari$Date=as.yearmon(Market_fiyatlari$Date)
+
+CPI=data.table(CPI)
+Exchange_Rate=data.table(Exchange_Rate)
+Interest_Rate=data.table(Interest_Rate)
+Market_fiyatlari=data.table(Market_fiyatlari)
+
+```
+# DATA VISUALIZATION AND INTERPRETATION 
+
+## 1. Analysis of USD/TRY Exchange Rate
+### 1.1 Time Series Plot of USD/TRY Exchange Rate
+```{r cars}
+ggplot(Exchange_Rate,aes(x=Date,y=ER,group=1))+ geom_line(color="brown",type="solid",size=1)+ggtitle("USD/TRY Rates Between 2020/01-2022/03")+xlab("Months")+ylab("USD/TRY Exchange Rates")
+```
+### 1.2 Histogram of USD/TRY Exchange Rate
+
+```{r pressure, echo=FALSE}
+ggplot(Exchange_Rate,aes(x=ER))+ geom_histogram(color="pink",fill="pink")+ggtitle(" Histogram of USD/TRY Rates Between 2020/01-2022/03")+xlab("USD/TRY Exchange Rates")
+```
+### 1.3 Box-Plot of USD/TRY Exchange Rate
+```{r}
+ggplot(Exchange_Rate,aes(x=ER))+ geom_boxplot(color="brown", fill="brown", alpha=0.5)+ggtitle(" Box-Plot of USD/TRY Rates Between 2020/01-2022/03")+xlab("USD/TRY Exchange Rates")
+```
+
+## 2. Analysis of Interest Rate
+### 2.1 Time Series Plot of Interest Rate
+```{r}
+ggplot(Interest_Rate,aes(x=Date,y=IR,group=1))+ geom_line(color="brown",type="solid",size=1)+ggtitle("Personal Bank Loan Interest Rates Between 2020/01-2022/03")+xlab("Years")+ylab("Interest Rates")
+```
+### 2.2 Histogram of Interest Rate
+```{r}
+ggplot(Interest_Rate,aes(x=IR))+ geom_histogram(color="pink",fill="pink")+ggtitle(" Histogram of Interest Rates Between 2020/01-2022/03")+xlab("Interest Rates")
+```
+
+### 2.3 Box-Plot of Interest Rate
+```{r}
+ggplot(Interest_Rate,aes(x=IR))+ geom_boxplot(color="brown", fill="brown", alpha=0.5)+ggtitle(" Box-Plot of Interest Rates Between 2020/01-2022/03")+xlab("Interest Rates")
+
+```
+## 3.Analysis of CPI
+### 3.1 Time Series Plot of CPI
+```{r}
+ggplot(CPI,aes(x=Date,y=Consumer_Price_Index,group=1))+ geom_line(color="brown",type="solid",size=1)+ggtitle("Consumer Production Index for Food Between 2020/01-2022/03")+xlab("Years")+ylab("CPI")
+```
+### 3.2 Histogram of CPI
+```{r}
+ggplot(CPI,aes(x=Consumer_Price_Index))+ geom_histogram(color="pink",fill="pink")+ggtitle(" Histogram of CPI Between 2020/01-2022/03")+xlab("CPI")
+```
+### 3.3 Box-Plot of CPI
+```{r}
+ggplot(CPI,aes(x=Consumer_Price_Index))+ geom_boxplot(color="brown", fill="brown", alpha=0.5)+ggtitle("Box-Plot of CPI Between 2020/01-2022/03")+xlab("CPI")
+```
+
+## 4.Analysis of 'Market Fiyatları' Search
+### 4.1 Time Series Plot of 'Market Fiyatları' Search
+```{r}
+ggplot(Market_fiyatlari,aes(x=Date,y=MF,group=1))+geom_line(color="brown",type="solid",size=1)+ggtitle(" 'Market Fiyatları' Search on Google Between 2020/01-2022/03")+xlab("Years")+ylab("Market Fiyatları Search")
+```
+### 4.2 Histogram of 'Market Fiyatları' Search
+```{r}
+ggplot(Market_fiyatlari,aes(x=MF))+geom_histogram(color="pink",fill="pink")+ggtitle(" Histogram of 'Market Fiyatları' Search Between 2020/01-2022/03")+xlab("'Market Fiyatları' Search")
+```
+
+### 4.3 Box-Plot of 'Market Fiyatları' Search
+```{r}
+ggplot(Market_fiyatlari,aes(x=MF))+geom_boxplot(color="brown", fill="brown", alpha=0.5)+ggtitle(" Box-Plot of 'Market Fiyatları' Search Between 2020/01-2022/03")+xlab("'Market Fiyatları' Search")
+```
+# CORRELATION ANALYSIS
+
+## Pairwise Correlation Analysis
+
+```{r}
+data=merge(Exchange_Rate,Interest_Rate,by='Date')
+data_new=merge(data,CPI,by='Date')
+data_last=merge(data_new,Market_fiyatlari,by='Date')
+data_last
+summary(data_last[,c(2:5)])
+correlation_analysis=cor(data_last[,c(2:5)])
+ggcorrplot(correlation_analysis,hc.order = TRUE,type="lower",lab=TRUE)
+
+```
+```{r}
+ggpairs(data_last[,c(2:5)])
+```
+From the correlation figures, it can be seen that CPI for food is highly correlated with the exchange rate. This situation can be explained by the government's import-export policy.The decrease in the food production in our country can explain this. In addition, even if there is a production, the transportation cost required to reach the consumer might be a reason of this relationship since we also import gasoline and vehicles from other countries.
+# CONCLUSION
+
+
