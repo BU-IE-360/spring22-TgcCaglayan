@@ -1,0 +1,155 @@
+---
+title: "HW2-V1"
+author: "Tugce Caglayan"
+date: '2022-05-14'
+output: html_document
+---
+
+```{r setup, include=FALSE,warning=FALSE}
+require(data.table)
+require(lubridate)
+require(ggplot2)
+require(GGally)
+require(forecast)
+require(zoo)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#Preperation of Data
+```{r}
+data_path="C:/Users/tugce/Desktop/SPRING 2022/IE 360/HW2/IE360_Spring22_HW2_data.csv"
+data=read.csv(data_path)
+data$Unleaded.Gasoline.Sale..UGS.=as.numeric(data$Unleaded.Gasoline.Sale..UGS.)
+data$X..LPG.Vehicles..NLPG.=as.numeric(data$X..LPG.Vehicles..NLPG.)
+data$X..Unleaded.Gasoline.Vehicles..NUGV.=as.numeric(data$X..Unleaded.Gasoline.Vehicles..NUGV.)
+data$GNP.Agriculture=as.numeric(data$GNP.Agriculture)
+data$GNP.Commerce=as.numeric(data$GNP.Commerce)
+data$Price.of.Diesel.Gasoline..PG.=as.numeric(data$Price.of.Diesel.Gasoline..PG.)
+data$GNP.Total=as.numeric(data$GNP.Total)
+data$Quarter=as.character(data$Quarter)
+data$Quarter=as.yearqtr(data$Quarter,format = "%Y_Q%q")
+data=data.table(data)
+head(data,25)
+str(data)
+
+
+```
+
+
+#Time Series of UGS
+```{r cars,warning=FALSE,error=FALSE}
+data$Unleaded.Gasoline.Sale..UGS. = ts(data$Unleaded.Gasoline.Sale..UGS., start = 2000,frequency= 4)
+ggplot(data, aes(Quarter,Unleaded.Gasoline.Sale..UGS. , group=1)) + geom_line()+geom_point()
+
+```
+From the graph, it can be observed that mean of the data is decreasing and the variance of the data is volatile. So, this time series data is not stationary. We could add trend and seasonality variable to explain the behavior of data.
+
+#ACF of Time Series UGS
+
+```{r pressure, echo=FALSE,warning=FALSE}
+acf(data$Unleaded.Gasoline.Sale..UGS.[0:28], 8)
+```
+Lag 1 and Lag 4 values are high, there might be a case that can be a reason for this behavior.
+
+
+#Adding Seasonality and Trend Data
+```{r,warning=FALSE}
+data[,trend:=1:.N]
+quarter=seq(1,4,by=1)
+data[,seasonality:=((1:.N)%%4)] 
+data[seasonality == 0, seasonality := 4]
+data$seasonality = as.factor(data$seasonality) 
+str(data)
+summary(data)
+```
+
+```{r,warning=FALSE}
+ggpairs(data[,-1,with=FALSE])
+```
+
+GGpairs plot show that X..Unleaded.Gasoline.Vehicles..NUGV.and X..LPG.Vehicles..NLPG.have relations which can be used to explain the model.
+
+
+Base model:
+```{r,warning=FALSE}
+model= lm(Unleaded.Gasoline.Sale..UGS.~trend ,data)
+summary(model)
+checkresiduals(model) 
+```
+
+
+```{r,warning=FALSE}
+model <- lm(Unleaded.Gasoline.Sale..UGS.~trend+as.factor(seasonality) -seasonality, data = data)
+summary(model)
+checkresiduals(model)
+```
+
+
+```{r,warning=FALSE}
+setDT(data)
+data[,.(two_lagged_sales = shift(data$Unleaded.Gasoline.Sale..UGS., n=2L, fill=NA))]
+data$two_lagged_sales = data[,.(two_lagged_sales = shift(data$Unleaded.Gasoline.Sale..UGS., n=2L, fill=NA))]
+```
+
+
+```{r,warning=FALSE}
+model<- lm(Unleaded.Gasoline.Sale..UGS.~trend+as.factor(seasonality)+two_lagged_sales, data)
+summary(model)
+checkresiduals(model$residual)
+```
+
+
+
+```{r,warning=FALSE}
+model <- lm(Unleaded.Gasoline.Sale..UGS.~trend+as.factor(seasonality)+X..LPG.Vehicles..NLPG. 
++X..Unleaded.Gasoline.Vehicles..NUGV.,data)
+summary(model)
+checkresiduals(model)
+```
+
+
+We can eliminate the NUGV variable.
+
+```{r,warning=FALSE}
+model <- lm(Unleaded.Gasoline.Sale..UGS.~trend+as.factor(seasonality)+X..LPG.Vehicles..NLPG.,data)
+summary(model)
+checkresiduals(model)
+```
+Adjusted R-squared value has increased with the new model.
+
+
+
+```{r,warning=FALSE}
+model= lm(Unleaded.Gasoline.Sale..UGS.~trend + seasonality 
+            + Price.of.Diesel.Gasoline..PG.+two_lagged_sales, data)
+summary(model)
+checkresiduals(model$residuals)
+```
+
+
+```{r,warning=FALSE}
+summary(data)
+```
+
+
+```{r,warning=FALSE}
+tmp=copy(data)
+tmp[,actual:=Unleaded.Gasoline.Sale..UGS.]
+tmp[,predictions:=predict(model,tmp)]
+print(tmp)
+tmp[ 30, "two_lagged_sales"] = 66210.0
+tmp[,predictions2:=predict(model,tmp)]
+tmp[ 31, "two_lagged_sales"] = 1110417.4
+tmp[,predictions2:=predict(model,tmp)]
+tmp[ 32, "two_lagged_sales"] = 848645.6
+tmp[,predictions2:=predict(model,tmp)]
+```
+
+```{r,warning=FALSE}
+print(tmp$predictions2)
+ggplot(tmp ,aes(x=Quarter)) +
+  geom_line(aes(y=actual,color='real', group = 1)) + 
+  geom_line(aes(y=predictions2, color = 'predicted', group = 1) )
+```
+
