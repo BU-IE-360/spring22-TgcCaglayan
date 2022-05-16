@@ -9,7 +9,7 @@ Link for the HW1 html file:
 [HW1](HW1/x.html)
 ### Homework 2
 Link for the HW1 .Rmd file:
-[link]https://github.com/BU-IE-360/spring22-TugceCaglayan/blob/gh-pages/HW2/hw2.Rmd
+[link](https://github.com/BU-IE-360/spring22-TugceCaglayan/blob/gh-pages/HW2/hw2.Rmd)
 
 Link for the HW1 html file:
 [HW2](HW2/hw2.html)
