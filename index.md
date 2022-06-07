@@ -19,7 +19,7 @@ Link for the HW1 html file:
 ### Project
 
 Link for the Project html file:
-[Project](https://github.com/BU-IE-360/spring22-TugceCaglayan/Project/IE360_Project_Group5.html)
+[Project](https://github.com/BU-IE-360/spring22-TugceCaglayan/blob/gh-pages/Project/IE360_Project_Group5.html)
 
 
 
