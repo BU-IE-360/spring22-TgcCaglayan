@@ -18,6 +18,9 @@ Link for the HW1 html file:
 
 ### Project
 
+Link for the Project.rmd file:
+[link](https://github.com/BU-IE-360/spring22-TugceCaglayan/blob/gh-pages/Project/IE360_Project_Group5.Rmd)
+
 Link for the Project html file:
 [Project](https://github.com/BU-IE-360/spring22-TugceCaglayan/blob/gh-pages/Project/IE360_Project_Group5.html)
 
